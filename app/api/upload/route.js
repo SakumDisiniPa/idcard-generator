@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import QRCode from "qrcode";
 import fs from "fs";
 import path from "path";
+import { put } from "@vercel/blob";
 
 export const dynamic = "force-dynamic"; // biar ga cache upload
 
@@ -33,10 +34,29 @@ export async function POST(req) {
   const fileName = `${uniqueId}${fileExtension}`; // menggunakan uniqueId untuk nama file
   const filePath = path.join(uploadDir, fileName);
 
-  // simpan file ke disk
+  // baca file ke buffer
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  fs.writeFileSync(filePath, buffer);
+
+  // Upload ke Vercel Blob
+  let uploadedImageUrl = `/uploads/${fileName}`; // fallback to local path if blob not available
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const blob = await put(fileName, buffer, {
+        access: "public",
+        contentType: file.type || "application/octet-stream",
+      });
+      uploadedImageUrl = blob.url;
+    } catch (err) {
+      // If blob upload fails, write to local uploads as fallback and continue
+      console.error("Vercel Blob upload failed, saving locally:", err.message);
+      fs.writeFileSync(filePath, buffer);
+    }
+  } else {
+    // no token configured - save locally
+    fs.writeFileSync(filePath, buffer);
+  }
 
   // buat QR transparan dan HD
   // Menggunakan uniqueId untuk URL QR
@@ -50,6 +70,25 @@ export async function POST(req) {
     },
     width: 800, // HD
   });
+
+  // Upload QR to Vercel Blob (or keep local qrcode as fallback)
+  const qrFileName = `${uniqueId}-qr.png`;
+  let uploadedQrUrl = `/qrcodes/${uniqueId}.png`;
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const qrBuffer = fs.readFileSync(qrPath);
+
+      const qrBlob = await put(qrFileName, qrBuffer, {
+        access: "public",
+        contentType: "image/png",
+      });
+      uploadedQrUrl = qrBlob.url;
+    } catch (err) {
+      console.error("Vercel Blob upload for QR failed, keeping local file:", err.message);
+      // keep local qrPath as fallback (already written by QRCode.toFile)
+    }
+  }
 
   // ✅ simpan data ke "database"
   const dbPath = path.join(process.cwd(), "data.json");
@@ -66,7 +105,8 @@ export async function POST(req) {
     nama: nama, // <-- Simpan data nama
     ttl: ttl,
     phone: phone,
-    image: `/uploads/${fileName}`,
+    image: uploadedImageUrl,
+    qr: uploadedQrUrl,
     createdAt: new Date().toISOString(),
   });
 
@@ -76,7 +116,7 @@ export async function POST(req) {
     success: true,
     id: uniqueId,
     token,
-    qrUrl: `/qrcodes/${uniqueId}.png`,
-    uploadedImage: `/uploads/${fileName}`,
+    qrUrl: uploadedQrUrl,
+    uploadedImage: uploadedImageUrl,
   });
 }

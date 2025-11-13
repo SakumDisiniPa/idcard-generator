@@ -81,7 +81,7 @@ export default function StatusPage() {
                     {/* Placeholder Foto atau Logo */}
                     <div className="mt-4 mx-auto w-24 h-24 rounded-full bg-green-100 flex items-center justify-center border-4 border-green-300 shadow-inner">
                         {/* Jika ada user.image, gunakan <img> tag di sini */}
-                        <span className="text-4xl text-green-600">🌿</span> 
+                        <img src={user.image} alt="Foto Pengguna" className="w-20 h-20 rounded-full object-cover" />
                     </div>
                 </div>
 
