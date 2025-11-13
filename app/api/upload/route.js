@@ -40,7 +40,7 @@ export async function POST(req) {
 
   // buat QR transparan dan HD
   // Menggunakan uniqueId untuk URL QR
-  const statusUrl = `http://localhost:3000/status/${uniqueId}?token=${token}`;
+  const statusUrl = `https://idcard-ptdahlia.sakum.my.id/status/${uniqueId}?token=${token}`;
   const qrPath = path.join(qrDir, `${uniqueId}.png`);
 
   await QRCode.toFile(qrPath, statusUrl, {
