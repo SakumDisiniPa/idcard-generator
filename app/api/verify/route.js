@@ -11,7 +11,7 @@ export async function GET(req) {
   }
 
   // Lokasi "database" (file JSON)
-  const dbPath = path.join(process.cwd(), "data.json");
+  const dbPath = path.join(process.cwd(), "data", "db.json");
 
   if (!fs.existsSync(dbPath)) {
     // 1. Jika database belum ada, anggap tidak valid
