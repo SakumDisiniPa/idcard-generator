@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ID Card Generator - PT DAHLIA
 
-## Getting Started
+Sistem generator dan verifikasi ID Card dengan QR Code terintegrasi.
 
-First, run the development server:
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env.local
+# Edit .env.local dengan credential Anda
+
+# Development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Production build
+npm run build
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📋 Environment Variables
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+BLOB_READ_WRITE_TOKEN    - Vercel Blob storage token
+SECRET_ACCESS_ID         - Server-side access ID
+NEXT_PUBLIC_SECRET_ACCESS_ID - Client-side access ID (sama dengan SECRET_ACCESS_ID)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Features
 
-## Learn More
+- 🔐 Access control dengan ID verifikasi
+- 📸 Upload foto dengan validasi
+- 🔲 Generate QR Code otomatis
+- ✅ Verify QR Code dengan token
+- 📱 Fully responsive design
+- 🌙 Dark mode support
+- 📦 Data stored in JSON format
+- 🔒 Type-safe TypeScript implementation
 
-To learn more about Next.js, take a look at the following resources:
+## 📱 Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/` - Main upload form (requires authentication)
+- `/status/[id]` - QR verification & data display
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+- Next.js 16 (App Router)
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- Vercel Blob Storage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  components/     - Reusable components (AuthForm, UploadForm, QRDisplay)
+  hooks/          - Custom hooks (useAuth)
+  utils/          - Utilities & validators
+  api/            - API routes (upload, verify)
+lib/
+  jsondb.ts       - JSON database utilities
+```
+
+## 🔄 Data Flow
+
+1. User login dengan access ID
+2. Upload foto + data personal
+3. Server generate token & QR Code
+4. Data disimpan ke JSON database
+5. User dapat download QR Code
+6. Scan QR untuk verifikasi data
+
